@@ -1,9 +1,12 @@
-# AI Skill Bridge 4C2C (Greenhack 2026)
+# AI Skill Bridge
+
+> A peer-to-peer learning platform that teaches non-technical employees to use AI tools responsibly and effectively. Employees complete practical tasks, evaluate each other's work against a configurable rubric, and earn XP as they progress.
+
+Built at GreenHack 06/2026 hackathon — 42 Prague by 4C2C team.
 
 <img width="1914" height="963" alt="Screenshot from 2026-06-06 10-58-45" src="https://github.com/user-attachments/assets/4f1db32a-4af4-4645-8463-d86b5c98e5ce" />
 
 ## Description
-A hands-on platform where employees try AI for real, review each other's results, and leave the room less afraid of it than when they walked in.
 
 Most people who are hesitant about AI aren't hesitant because it's hard. They're hesitant because they've never had a safe, structured place to try it with someone watching their back.
 
@@ -30,7 +33,6 @@ One session where a person actually succeeds — and hears from a peer that it w
 Every unnecessary query has a real cost: electricity, cooling water, compute time — paid for by the organisation and the grid. A workforce that uses AI precisely sends fewer requests, gets better answers, and reduces load on infrastructure with a physical footprint. At company scale that is a real reduction in both cost and environmental impact.
 
 The platform follows the same principle. Row-level locking instead of polling loops, files on disk rather than in the database, a single process sized to actual load. We build it the way we teach people to use AI — without waste.
-
 
 ## Instructions
 
