@@ -1,0 +1,613 @@
+/* ============================================================
+   AURORA — design-system layer for AI Skill Bridge
+   Drop-in OVERRIDE for the existing token system.
+   Load AFTER legacy.css:
+     import "@/styles/legacy.css";
+     import "@/styles/aurora.css";   // <-- this file, second
+   Re-tints the neutral palette to a cool enterprise base, keeps
+   green as the primary accent, introduces a serif/sans/mono type
+   system, and layers a blue→violet "AI aurora" on top.
+   No component (.tsx) changes required — it all rides the tokens
+   and class names the app already uses.
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+/* Production tip: prefer next/font/google in layout.tsx over @import for zero-FOUT loading. */
+
+/* ---------------- 1 · TOKENS (cool enterprise neutrals) ---------------- */
+:root {
+  --bg:        #f5f6f9;
+  --surface:   #ffffff;
+  --surface-2: #f6f7fa;
+  --surface-3: #eef0f5;
+  --ink:       #14161d;
+  --ink-2:     #565d6e;
+  --ink-3:     #898f9f;
+  --line:      #e3e6ec;
+  --line-2:    #eef0f4;
+
+  /* green stays the primary action/success accent */
+  --accent:      #0f9d6b;
+  --accent-deep: #0a7d54;
+
+  /* softer, modern elevation */
+  --shadow-sm: 0 1px 2px rgba(20,22,30,.05);
+  --shadow:    0 1px 2px rgba(20,22,30,.04), 0 6px 18px rgba(20,22,30,.07);
+  --shadow-lg: 0 18px 50px rgba(20,22,30,.16);
+
+  /* type system */
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:  "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  /* --font (mono) is inherited from legacy.css and stays the UI workhorse */
+
+  /* --- AI aurora --- */
+  --ai-cyan:   #1fc4e0;
+  --ai-blue:   #3b6dff;
+  --ai-indigo: #6d5cff;
+  --ai-violet: #9b4dff;
+  --ai-magenta:#c44be0;
+  --ai-grad:     linear-gradient(135deg, var(--ai-blue), var(--ai-violet));
+  --ai-grad-tri: linear-gradient(135deg, var(--ai-blue), var(--ai-indigo) 52%, var(--ai-violet));
+  --ai-spectrum: linear-gradient(100deg, var(--ai-cyan), var(--ai-blue) 32%, var(--ai-indigo) 56%, var(--ai-violet) 78%, var(--ai-magenta));
+  --ai-soft:   color-mix(in oklch, var(--ai-indigo) 11%, var(--surface));
+  --ai-line:   color-mix(in oklch, var(--ai-indigo) 32%, var(--surface));
+  --ai-ink:    #5b46e0;
+  --glow-ai:    0 6px 22px color-mix(in oklch, var(--ai-indigo) 30%, transparent);
+  --glow-green: 0 6px 18px color-mix(in oklch, var(--accent) 28%, transparent);
+
+  /* matrix-energy dial: scales mesh + shimmer intensity (0–1) */
+  --energy: .45;
+}
+
+.dark {
+  --bg:        #0b0d13;
+  --surface:   #161922;
+  --surface-2: #1c202b;
+  --surface-3: #232834;
+  --ink:       #eceef3;
+  --ink-2:     #a3a9b8;
+  --ink-3:     #6b7184;
+  --line:      #2a303c;
+  --line-2:    #222732;
+
+  --ai-soft: color-mix(in oklch, var(--ai-indigo) 22%, var(--surface));
+  --ai-line: color-mix(in oklch, var(--ai-indigo) 48%, var(--surface));
+  --ai-ink:  #b3a8ff;
+  --glow-ai: 0 8px 30px color-mix(in oklch, var(--ai-indigo) 50%, transparent);
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.45);
+  --shadow:    0 1px 2px rgba(0,0,0,.45), 0 8px 22px rgba(0,0,0,.5);
+  --shadow-lg: 0 22px 56px rgba(0,0,0,.65);
+}
+
+/* ---------------- 2 · TYPE (serif display · sans reading · mono UI) ---------------- */
+.h1, .h2, .project-title, .lp-node-title, .onboard-burst-title,
+.post-submit-hero .h1, .post-submit-hero .h2 {
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: -.012em;
+}
+.h1 { letter-spacing: -.018em; }
+
+/* reading-heavy copy → humanist sans */
+.fb-quote, .onboard-body, .lp-node-desc, .eval-text, .notes,
+.trust-panel p, .markdown-body, .md, .prose, .reading {
+  font-family: var(--sans);
+}
+.fb-quote { font-style: italic; }
+
+/* primary action keeps its weight; deepen hover instead of brighten */
+.btn.primary { box-shadow: var(--glow-green); }
+.btn.primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); filter: none; }
+
+/* every input glows aurora-indigo on focus — "this is where you talk to the system" */
+input.inp:focus, .sel:focus, .eval-text:focus, .notes:focus, .search:focus-within {
+  border-color: var(--ai-line);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ai-indigo) 14%, transparent);
+}
+
+/* ---------------- 3 · AI AURORA on existing classes (no markup change) ---------------- */
+
+/* brand mark → gradient chip + glow */
+.brand .mark {
+  background: var(--ai-grad);
+  color: #fff;
+  border-radius: 9px;
+  padding: 5px;
+  box-shadow: var(--glow-ai);
+}
+
+/* "Most helpful this week" featured card → AI spectrum edge + glow */
+.featured.shiny::before {
+  background:
+    conic-gradient(from var(--shine-a),
+      color-mix(in oklch, var(--ai-blue) 30%, transparent) 0deg,
+      var(--ai-blue) 60deg,
+      var(--ai-indigo) 120deg,
+      var(--ai-violet) 180deg,
+      color-mix(in oklch, var(--ai-violet) 30%, transparent) 250deg,
+      color-mix(in oklch, var(--ai-blue) 30%, transparent) 360deg);
+}
+.featured.shiny::after {
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--ai-indigo) 24%, transparent), transparent 70%);
+}
+
+/* prominent exercise CTA → aurora gradient */
+.exercise-submit-btn {
+  background: var(--ai-grad);
+  box-shadow: var(--glow-ai);
+}
+.exercise-submit-btn:hover { background: var(--ai-grad); filter: brightness(1.06); }
+
+/* ---------------- 4 · NEW opt-in AI primitives (use in .tsx when you want a moment) ---------------- */
+
+/* gradient text — <span className="ai-text">Most helpful</span> */
+.ai-text {
+  background: var(--ai-grad-tri);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+}
+
+/* AI pill / badge / avatar — <span className="pill ai"> */
+.pill.ai   { background: var(--ai-soft); border-color: var(--ai-line); color: var(--ai-ink); }
+.badge.ai  { background: var(--ai-soft); border-color: var(--ai-line); color: var(--ai-ink); }
+.av.ai     { background: var(--ai-soft); border-color: var(--ai-line); color: var(--ai-ink); }
+
+/* AI progress bar — <div className="bar ai"><i .../></div> */
+.bar.ai > i { background: var(--ai-grad); }
+
+/* AI button — <button className="btn ai"> (reserved for "Generate / Ask AI") */
+.btn.ai {
+  position: relative; overflow: hidden;
+  background: var(--ai-grad); border-color: transparent; color: #fff;
+  box-shadow: var(--glow-ai);
+}
+.btn.ai:hover { filter: brightness(1.06); }
+.btn.ai::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.35) 48%, transparent 62%);
+  transform: translateX(-120%);
+  opacity: var(--energy);
+  animation: au-scan 3.4s ease-in-out infinite;
+}
+@keyframes au-scan { 0% { transform: translateX(-120%); } 55%,100% { transform: translateX(120%); } }
+@media (prefers-reduced-motion: reduce) { .btn.ai::after { display: none; } }
+
+/* AI card — gradient hairline edge — <div className="card ai">  add "glow" for shadow */
+.card.ai {
+  position: relative; border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    var(--ai-grad-tri) border-box;
+}
+.card.ai.glow { box-shadow: var(--glow-ai); }
+
+/* AI assist surface — corner aurora glow — <div className="ai-surface"> */
+.ai-surface {
+  position: relative; overflow: hidden; border-radius: var(--radius);
+  background: var(--surface); border: 1px solid var(--ai-line); padding: var(--pad);
+}
+.ai-surface::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(80% 120% at 100% 0%, color-mix(in oklch, var(--ai-violet) 14%, transparent), transparent 60%),
+    radial-gradient(70% 100% at 0% 100%, color-mix(in oklch, var(--ai-blue) 12%, transparent), transparent 55%);
+  opacity: calc(.5 + .5 * var(--energy));
+}
+.ai-surface > * { position: relative; z-index: 1; }
+
+/* faint grid mesh substrate — add className="au-mesh" to a panel */
+.au-mesh { position: relative; }
+.au-mesh::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(color-mix(in oklch, var(--ai-indigo) 100%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, var(--ai-indigo) 100%, transparent) 1px, transparent 1px);
+  background-size: 30px 30px;
+  opacity: calc(.05 * var(--energy));
+  -webkit-mask: radial-gradient(120% 100% at 80% 0%, #000, transparent 72%);
+          mask: radial-gradient(120% 100% at 80% 0%, #000, transparent 72%);
+}
+.au-mesh > * { position: relative; z-index: 1; }
+
+/* ---------------- 5 · Missing role primitives used by Studio (added 2026-06) ----------------
+   Type roles are class-driven; legacy.css defines .h2 .h3 .lbl. Aurora adds display
+   tiers + mono/num data roles so page files never hand-set font-family. */
+.display { font-family: var(--serif); font-weight: 600; letter-spacing: -.02em; font-size: 38px; line-height: 1.05; margin: 0; }
+.d2      { font-family: var(--serif); font-weight: 600; letter-spacing: -.018em; font-size: 28px; line-height: 1.1; margin: 0; }
+.d3      { font-family: var(--serif); font-weight: 600; letter-spacing: -.014em; font-size: 21px; line-height: 1.15; margin: 0; }
+.mono    { font-family: var(--font); }
+.num     { font-family: var(--font); font-variant-numeric: tabular-nums; }
+
+/* .field — labelled input shell so Mantine inputs read as Aurora fields */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > .field-label { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; display: flex; justify-content: space-between; gap: 8px; }
+.field > .field-hint  { font-size: 11px; color: var(--ink-3); }
+
+/* Studio-specific layout helpers (consume tokens) */
+.studio-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gap); flex-wrap: wrap; }
+.studio-grid { display: grid; grid-template-columns: 1fr; gap: var(--gap); }
+@media (min-width: 1080px) { .studio-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); } }
+
+.studio-shell { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.studio-section + .studio-section { margin-top: var(--gap); }
+
+/* Live LLM status dot */
+.llm-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ink-3) 18%, transparent); }
+.llm-dot.on  { background: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 22%, transparent); }
+.llm-dot.off { background: #d77a3a; box-shadow: 0 0 0 3px color-mix(in oklch, #d77a3a 22%, transparent); }
+
+/* mini chat bubble — Aurora flavored, plays nice with .card.ai */
+.chat-bubble { padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+.chat-bubble.user      { background: var(--surface-2); }
+.chat-bubble.assistant { background: var(--ai-soft); border-color: var(--ai-line); color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .bar.ai > i { transition: none; }
+}
+
+/* Tasks list — selected-state outline for clickable list cards.
+   Pairs `.card` with `.sel-on` to mark the focused item without burning
+   green on a non-action moment. `.task-card` adds the hover affordance. */
+.card.task-card { transition: background var(--mut), border-color var(--mut), transform var(--mut); cursor: pointer; }
+.card.task-card:hover { background: var(--surface-2); transform: translateY(-1px); }
+.card.sel-on {
+  border-color: color-mix(in oklch, var(--accent) 35%, var(--line));
+  background: color-mix(in oklch, var(--accent) 6%, var(--surface));
+  box-shadow: var(--shadow);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card.task-card:hover { transform: none; }
+}
+
+/* ---------------- 6 · Onboarding primitives (added 2026-06) ----------------
+   Small additions used only by the onboarding modal. Kept token-only so both
+   light + dark themes work. No new font-families, no new colors. */
+
+/* generic .pill toggle state — used by goal chips + dept suggestions.
+   Reuses --accent so it inherits the user's accent. Not green-loud. */
+.pill.on {
+  background: color-mix(in oklch, var(--accent) 14%, var(--surface));
+  border-color: color-mix(in oklch, var(--accent) 35%, var(--line));
+  color: var(--ink);
+}
+
+/* step indicator dots — used as <span className="dot on" /> in a .onboard-dots row */
+.onboard-dots { gap: 6px; justify-content: center; margin-bottom: 4px; }
+.onboard-dots .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--line); transition: background var(--mut), transform var(--mut);
+}
+.onboard-dots .dot.done { background: color-mix(in oklch, var(--accent) 55%, var(--line)); }
+.onboard-dots .dot.on   { background: var(--accent); transform: scale(1.25); }
+@media (prefers-reduced-motion: reduce) {
+  .onboard-dots .dot.on { transform: none; }
+}
+
+/* low-emphasis skip link inside the modal */
+.onboard-skip {
+  align-self: center; background: transparent; border: none;
+  color: var(--ink-3); font-size: 12px; text-decoration: underline;
+  padding: 4px 6px; cursor: pointer;
+}
+.onboard-skip:hover { color: var(--ink-2); }
+
+/* live peer-count line */
+.onboard-peer { margin: 0; color: var(--ink-3); }
+
+/* native range slider, themed via tokens */
+.onboard-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px; background: var(--line); border-radius: 999px; outline: none;
+}
+.onboard-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--accent); cursor: pointer;
+}
+.onboard-slider::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--accent); cursor: pointer;
+}
+.onboard-slider:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 30%, transparent); }
+
+/* ---------------- 6 · Aurora Sidebar (ported from reference HTML 2026-06) ----------------
+   The reference's <aside class="side au-mesh"> uses <button> rows + a brand block with
+   a gradient mark + an AI-usage panel + a dashed Facilitator link. Legacy.css targets
+   `.side-nav a` which doesn't match this markup, so we layer the verbatim styles here.
+   Tokens only — no hardcoded colors. */
+.side {
+  width: 248px; flex: none;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  padding: 18px; gap: 22px;
+}
+.brand { display: flex; align-items: center; gap: 11px; }
+.brand .mark {
+  width: 34px; height: 34px; flex: none; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ai-grad); color: #fff; box-shadow: var(--glow-ai);
+}
+.brand .mark svg { width: 19px; height: 19px; }
+.brand .nm {
+  font-family: var(--serif); font-weight: 600; font-size: 16.5px;
+  letter-spacing: -.01em; line-height: 1;
+}
+.brand .nm small {
+  display: block; font-family: var(--font); font-size: 9px;
+  letter-spacing: .15em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 500; margin-top: 3px;
+}
+
+.side-nav { display: flex; flex-direction: column; gap: 3px; }
+.side-nav button {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 12px; border-radius: var(--r-sm, 9px);
+  color: var(--ink-2); cursor: pointer; font-size: 14px; font-weight: 500;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+  border: 1px solid transparent; background: none; text-align: left;
+  width: 100%; font-family: inherit;
+}
+.side-nav button svg { width: 18px; height: 18px; flex: none; }
+.side-nav button:hover { background: var(--surface-2); color: var(--ink); }
+.side-nav button.on {
+  background: color-mix(in oklch, var(--accent) 11%, var(--surface));
+  color: var(--accent);
+  border-color: color-mix(in oklch, var(--accent) 32%, var(--surface));
+}
+.side-nav button.ai-nav.on {
+  background: var(--ai-soft);
+  color: var(--ai-ink, var(--ai-indigo));
+  border-color: var(--ai-line);
+}
+.side-nav .ct {
+  margin-left: auto; font-family: var(--font); font-size: 10px;
+  background: var(--surface-3); color: var(--ink-2);
+  border-radius: 999px; padding: 1px 7px;
+}
+.side-nav button.on .ct {
+  background: color-mix(in oklch, var(--accent) 18%, var(--surface));
+  color: var(--accent);
+}
+.side .spacer { flex: 1; }
+.side-sect {
+  font-family: var(--font); font-size: 10px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-3);
+  padding: 0 2px; margin-bottom: 9px;
+  display: flex; align-items: center; gap: 7px; font-weight: 500;
+}
+.side-sect svg { width: 14px; height: 14px; color: var(--ai-ink, var(--ai-indigo)); }
+
+.usage {
+  padding: 13px; background: var(--surface-2);
+  border: 1px solid var(--line); border-radius: var(--r, 12px);
+}
+.usage .top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+.usage .big { font-family: var(--font); font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
+.usage .big span { font-size: 11px; color: var(--ink-3); font-weight: 500; }
+.usage .meta { font-family: var(--font); font-size: 10.5px; color: var(--ink-3); margin: 0 0 9px; }
+.usage .foot { font-size: 11px; color: var(--ink-3); margin-top: 9px; display: flex; align-items: center; gap: 6px; line-height: 1.4; }
+.usage .foot svg { width: 13px; height: 13px; color: var(--ai-ink, var(--ai-indigo)); flex: none; }
+
+.faclink {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 12px; margin-top: 10px;
+  border-radius: var(--r-sm, 9px); color: var(--ink-3);
+  font-size: 12.5px; cursor: pointer;
+  transition: color .15s ease, border-color .15s ease;
+  border: 1px dashed var(--line); background: none;
+  width: 100%; font-family: inherit;
+}
+.faclink:hover { color: var(--ink-2); border-color: var(--ink-3); }
+.faclink svg { width: 15px; height: 15px; }
+
+/* small icon row under usage panel — preserves settings + sign-out access
+   that used to live in the old sidebar */
+.side-tools { display: flex; gap: 6px; margin-top: 10px; }
+.side-tools button {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 7px 9px; font-size: 11.5px; font-family: inherit;
+  background: none; border: 1px solid var(--line); border-radius: var(--r-sm, 9px);
+  color: var(--ink-3); cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.side-tools button:hover { color: var(--ink); background: var(--surface-2); border-color: var(--ink-3); }
+.side-tools button svg { width: 14px; height: 14px; }
+
+@media (max-width: 860px) { .side { display: none; } }
+
+/* ---------------- 7 · Classroom + Peers primitives (added 2026-06) ----------------
+   Token-only helpers so the learn/peer blueprints port directly. Status colors
+   are independent of --accent so "done/now/warn" read as state, not brand. */
+
+/* status tokens — success green + caution amber (distinct from accent) */
+:root {
+  --green: #2f9e72;
+  --green-soft: color-mix(in oklch, #2f9e72 14%, var(--surface));
+  --green-line: color-mix(in oklch, #2f9e72 32%, var(--line));
+  --warn: #c08a2b;
+  --warn-soft: color-mix(in oklch, #c08a2b 16%, var(--surface));
+  --warn-line: color-mix(in oklch, #c08a2b 34%, var(--line));
+}
+.dark {
+  --green-soft: color-mix(in oklch, #2f9e72 22%, var(--surface));
+  --warn-soft: color-mix(in oklch, #c08a2b 22%, var(--surface));
+}
+
+/* status pills */
+.pill.green { background: var(--green-soft); border-color: var(--green-line); color: var(--green); }
+.pill.warn  { background: var(--warn-soft);  border-color: var(--warn-line);  color: var(--warn); }
+
+/* responsive two-column shell: main grows, rail is fixed-ish on wide screens */
+.wrapw { width: 100%; }
+.resp { display: flex; flex-direction: column; gap: var(--gap); align-items: stretch; }
+.resp > .grow { min-width: 0; }
+.resp > .rail { min-width: 0; }
+@media (min-width: 1080px) {
+  .resp { flex-direction: row; align-items: flex-start; }
+  .resp > .rail { width: 340px; flex: none; }
+}
+
+/* horizontal day path — lets the .path scroll on narrow screens */
+.daystrip { overflow-x: auto; padding-bottom: 4px; }
+.daystrip::-webkit-scrollbar { height: 6px; }
+.daystrip::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+
+/* mission/feature icon chip */
+.mi {
+  flex: none; width: 38px; height: 38px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-2);
+}
+.mi svg { width: 18px; height: 18px; }
+.mi.ai    { background: var(--ai-soft); border-color: var(--ai-line); color: var(--ai-ink); }
+.mi.green { background: var(--green-soft); border-color: var(--green-line); color: var(--green); }
+.mi.warn  { background: var(--warn-soft); border-color: var(--warn-line); color: var(--warn); }
+
+/* live pulse dot */
+.pulse {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green); position: relative; flex: none;
+}
+.pulse::after {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%;
+  background: var(--green); opacity: .35; animation: au-pulse 1.8s ease-out infinite;
+}
+.pulse.ai { background: var(--ai-indigo); }
+.pulse.ai::after { background: var(--ai-indigo); }
+@keyframes au-pulse { 0% { transform: scale(.6); opacity: .45; } 100% { transform: scale(1.7); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pulse::after { animation: none; } }
+
+/* small inline status dot */
+.dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); flex: none; }
+.dot.ai { background: var(--ai-indigo); }
+.dot.green { background: var(--green); }
+
+/* live feed row */
+.feed-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 12.5px;
+}
+.feed-item:last-child { border-bottom: none; }
+.feed-item .feed-dot { margin-top: 5px; }
+
+/* section eyebrow */
+.sect-title {
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 500; margin: 0;
+}
+
+/* extra-low-emphasis text */
+.faint { color: var(--ink-3); opacity: .85; }
+
+/* hover affordance for clickable cards/rows */
+.card.hover, .hover { transition: background var(--mut), border-color var(--mut), transform var(--mut); cursor: pointer; }
+.card.hover:hover { background: var(--surface-2); transform: translateY(-1px); border-color: var(--ink-3); }
+@media (prefers-reduced-motion: reduce) { .card.hover:hover { transform: none; } }
+
+/* serif role for inline use */
+.serif { font-family: var(--serif); }
+
+/* gentle reveal on mount */
+.reveal { animation: au-reveal .4s ease both; }
+@keyframes au-reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .reveal { animation: none; } }
+
+/* peer evaluate / schedule tiles + rubric scales */
+.tiles { display: grid; gap: 11px; }
+.tiles.c2 { grid-template-columns: 1fr 1fr; }
+.tiles.c3 { grid-template-columns: repeat(3, 1fr); }
+.tile {
+  border: 1px solid var(--line); background: var(--surface); border-radius: var(--r);
+  padding: 14px; cursor: pointer; transition: background var(--mut), border-color var(--mut);
+  display: flex; flex-direction: column; gap: 5px; text-align: left; font-family: inherit; color: var(--ink);
+}
+.tile:hover { border-color: var(--ink-3); }
+.tile.on { border-color: var(--ai-indigo); background: var(--ai-soft); }
+.tile b { font-size: 13.5px; font-weight: 600; }
+.tile small { color: var(--ink-2); font-size: 11.5px; line-height: 1.4; }
+.tile-head { display: flex; align-items: center; justify-content: space-between; }
+.tile .ti-ic { color: var(--ink-2); display: flex; }
+.tile.on .ti-ic { color: var(--ai-ink); }
+.tile .ti-ic svg { width: 22px; height: 22px; }
+.tile .tick {
+  width: 18px; height: 18px; border-radius: 50%; background: var(--ai-grad); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 11px; opacity: 0; transition: opacity var(--mut);
+}
+.tile.on .tick { opacity: 1; }
+
+.scale { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+.scale button {
+  width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink-2); font-family: var(--mono); font-size: 14px;
+  cursor: pointer; transition: background var(--mut), border-color var(--mut), color var(--mut);
+}
+.scale button:hover { border-color: var(--ink-3); }
+.scale button.on { background: var(--ai-grad); color: #fff; border-color: transparent; }
+
+.ta {
+  width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px;
+  padding: 10px 12px; font-family: var(--sans); font-size: 13.5px; color: var(--ink); resize: vertical;
+  transition: border-color var(--mut), box-shadow var(--mut);
+}
+.ta:focus {
+  outline: none; border-color: var(--ai-line);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ai-indigo) 14%, transparent);
+}
+.fieldrow { display: flex; flex-direction: column; gap: 7px; }
+.fieldrow > label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 500;
+}
+
+.pad-lg { padding: 28px 24px; }
+
+/* ---------------- TOAST ---------------- */
+.toast {
+  position: fixed; left: 50%; bottom: 26px;
+  transform: translateX(-50%) translateY(14px); z-index: 300;
+  background: var(--ink); color: var(--surface); border-radius: 999px;
+  padding: 11px 17px; font-size: 13px; box-shadow: var(--shadow-lg);
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.eval-modal--wide { width: min(920px, 96vw); }
+.eval-modal--reflect { width: min(720px, 94vw); }
+
+@media (max-width: 680px) {
+  .tiles.c2, .tiles.c3 { grid-template-columns: 1fr; }
+  .eval-fields { flex-direction: column; }
+}
+
+/* ---------------- MANTINE ↔ AURORA (light mode legibility) ---------------- */
+.app-root:not(.dark) .mantine-Textarea-input,
+.app-root:not(.dark) .mantine-Input-input,
+.app-root:not(.dark) .mantine-Select-input {
+  background-color: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.app-root:not(.dark) .mantine-Textarea-input::placeholder,
+.app-root:not(.dark) .mantine-Input-input::placeholder {
+  color: var(--ink-3);
+}
+.app-root:not(.dark) .mantine-Tabs-tab[data-active] {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.app-root:not(.dark) .mantine-Tabs-tab:not([data-active]) {
+  color: var(--ink-2);
+}
+.app-root:not(.dark) .mantine-Alert-title {
+  color: var(--ink);
+}
+.app-root:not(.dark) .mantine-Alert-message {
+  color: var(--ink-2);
+}
+.app-root:not(.dark) .mantine-Text-root[data-variant="default"][style*="--text-color: var(--mantine-color-dimmed)"] {
+  color: var(--ink-2);
+}

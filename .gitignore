@@ -1,0 +1,16 @@
+neighbor-team-info.md
+uv.lock
+__pycache__
+.venv
+4c2c
+
+node_modules/
+uploads/
+
+use_ai/ 
+aibridge/
+docs/
+SSOT/
+.
+.SSoT.md
+notes.txt
