@@ -23,6 +23,52 @@ The platform follows the same principle. Row-level locking instead of polling lo
 
 ## Instructions
 
+## Prerequisites
+
+| Tool | Version | Install |
+|------|---------|---------|
+| Docker + Compose | any recent | https://docs.docker.com/get-docker |
+| uv | ≥ 0.4 | `pip install uv` |
+| Python | 3.12 (managed by uv) | automatic |
+| Node.js | any recent | https://nodejs.org/en/download |
+
+---
+
+### Quick Setup backend
+
+```bash
+cd backend
+make env          # copy .env.example → .env
+make stack        # Postgres + API + Loki/Grafana/Promtail (detached)
+make run          # API with hot reload → http://localhost:8000/docs
+make seed         # admin, power user, demo tasks
+```
+
+Detail information in
+```
+/backend/README.md
+```
+
+### Start frontend
+
+Run the development server:
+
+```bash
+# go into directory
+cd frontend
+
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+
 ## Implementation
 A full backend API — authentication, task and rubric management, a peer evaluation pool with concurrency-safe slot claiming, XP and badge-based progression, and a personal dashboard.
 Facilitators can create and modify tasks and evaluation forms live during a session — no redeploy, no IT ticket. Each task has a configurable rubric: yes/no checks, 1–5 ratings, free text. Evaluations require a written verdict and feedback before XP is awarded.
