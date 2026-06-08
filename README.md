@@ -94,3 +94,9 @@ The evaluation pool uses row-level locking on Postgres so concurrent participant
 
 Deployed with one command. Seeded with four real tasks. Six automated tests on the core invariants.
 
+
+## Team
+- [Martin Justa](https://github.com/Aztaban) - backend
+- [Martin Man](https://github.com/mandev-1) - frontend
+- [Petr Simcak](https://github.com/simcak) - frontend
+- [Simona Sucha](https://github.com/vincent-syma) - backend
